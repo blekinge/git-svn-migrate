@@ -10,4 +10,19 @@
 #
 # You can modify this script to return whatever you think is appropriate for a
 # given username in your organization.
-echo "$1 <$1>";
+#echo "$1 <$1@kb.dk>";
+
+
+curl \
+    -s \
+    --netrc \
+    -X POST \
+    -H "Content-Type: application/json" \
+    https://sbprojects.statsbiblioteket.dk/crowd/rest/admin/1.0/users/search/ \
+    -d '{"search": "'$1'", "active":null}' | \
+    jq --arg id $1 '.values | map(select(.username==$id or
+                             .username==($id+"@statsbiblioteket.dk") or
+                             .username==($id+"@kb.dk")))
+                | .[0]
+                | .displayName+" "+"<"+.email+">"' -r
+
