@@ -97,8 +97,8 @@ until [[ -z "$1" ]]; do
     d )            destination=$value;;
     destination )  destination=$value;;
 
-    h )            echo $help | less >&2; exit;;
-    help )         echo $help | less >&2; exit;;
+    h )            echo -e $help | less >&2; exit;;
+    help )         echo -e $help | less >&2; exit;;
 
     * )            echo "Unknown option: $option\n$usage" >&2; exit 1;;
   esac
@@ -128,16 +128,16 @@ do
   name=`echo $line | awk '{print $1}'`;
   url=`echo $line | awk '{print $2}'`;
   # Check for simple 1-field format:  URL
-  if [[ $url == '' ]]; then
-    url=$name;
-    name=`basename $url`;
+  if [[ "$url" == '' ]]; then
+    url="$name";
+    name="`basename $url`";
   fi
   # Process the log of each Subversion URL.
   echo "Processing \"$name\" repository at $url..." >&2;
   /bin/echo -n "  " >&2;
   svn log -q $url | awk -F '|' '/^r/ {sub("^ ", "", $2); sub(" $", "", $2); print $2" = "$2" <"$2">"}' | sort -u >> $tmp_file;
   echo "Done." >&2;
-done < $url_file
+done < "$url_file"
 
 # Process temp file one last time to show results.
 if [[ $destination == '' ]]; then
